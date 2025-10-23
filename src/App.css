@@ -1,0 +1,21 @@
+body{
+  background-image: url('./assets/wallpaperflare.com_wallpaper\ \(1\).jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.cardContent{
+  transition: all 0.2s !important;
+}
+
+.cardContent:hover{
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px !important;
+}
+
+.task-text {
+  word-break: break-word;     /* breaks long words if needed */
+  white-space: normal;        /* allows wrapping to next line */
+  max-width: 15ch;            /* ~20 characters per line */
+}
