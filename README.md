@@ -1,16 +1,29 @@
-# React + Vite
+🧾 React Todo App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a simple and interactive Todo List web application built with React.js as my first React project.
+It helps users easily manage their daily tasks with options to add, edit, delete, and mark tasks as finished — all while keeping data saved automatically using the browser’s localStorage.
+The app is designed with a clean, responsive layout using Material UI components, focusing on simplicity and usability. Each feature demonstrates a practical understanding of React hooks (useState, useEffect) and component-based architecture.
 
-Currently, two official plugins are available:
+⚙️ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+➕ Add new tasks with titles and details
+✏️ Edit existing tasks through a popup dialog
+🗑️ Delete tasks with confirmation
+✅ Mark tasks as finished or unfinished
+🔄 Tasks are automatically saved in localStorage
+🎨 Modern responsive UI built with Material UI
+🧩 Filter tasks (All / Finished / Non-Finished)
 
-## React Compiler
+🧠 What I Learned
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+-Building reusable React components (TodoList, TodoCard, etc.)
+-Managing state and user input with useState
+-Handling side effects and data persistence using useEffect
+-Implementing conditional rendering and filtering logic
+-Integrating Material UI for faster, cleaner styling
 
-## Expanding the ESLint configuration
+🧰 Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+-Frontend: React.js, JavaScript, HTML, CSS
+-UI Library: Material UI
+-Storage: Browser localStorage
