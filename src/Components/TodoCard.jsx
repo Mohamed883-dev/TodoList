@@ -6,8 +6,8 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import Card from '@mui/material/Card';
-import { v4 as uuidv4 } from 'uuid';
-import { useState, useEffect } from "react"; 
+// import { v4 as uuidv4 } from 'uuid';
+import { useState ,useEffect, useMemo } from "react"; 
 
 // dialog imports 
 import Dialog from '@mui/material/Dialog';
@@ -19,17 +19,18 @@ import DialogTitle from '@mui/material/DialogTitle';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
+import { useSnackBar } from '../Contexts/SnackBarContext';
+import { useTodos } from '../Contexts/TodosContext';
 // Initial Data
-const initialTodos = [
-  { id: uuidv4(), title: "here's the task 1", details: "project details 1", isFinished: false },
-  { id: uuidv4(), title: "here's the task 2", details: "project details 2", isFinished: false },
-  { id: uuidv4(), title: "here's the task 3", details: "project details 3", isFinished: false }
-];
+
+
 
 export default function TodoCard() {
 
   // ----------------- 🧠 States -----------------
-  const [todos, setTodos] = useState(initialTodos);
+  // const [todos2, setTodos] = useState(initialTodos);
+  // const [todos ,Dispatch] = useReducer(todoReducer , initialTodos)
+
   const [inputValue, setInputValue] = useState("");
   const [DeleteDialog, setDeleteDialog] = useState(false);
   const [EditDialog, setEditDialog] = useState(false);
@@ -37,34 +38,23 @@ export default function TodoCard() {
   const [SelectedTodoId, setSelectedTodoId] = useState(null);
   const [DisplayFilterTodos,setDisplayFilterTodos] = useState("all")
 
+
+  // custom hooks for useContext
+  const {HandleSnackBarAppear} = useSnackBar()
+  const {todos,Dispatch} = useTodos();
+
   // ----------------- 💾 Load from LocalStorage -----------------
-  useEffect(() => {
-    try {
-      const StorageTodos = JSON.parse(localStorage.getItem("todos"));
-      if (Array.isArray(StorageTodos)) {
-        setTodos(StorageTodos);
-      }
-    } catch (err) {
-      console.error("Invalid data in localStorage, clearing it:", err);
-      localStorage.removeItem("todos");
-    }
-  }, []);
+
+  	useEffect(() => {
+		Dispatch({ type: "get" });
+	}, []);
+
 
   // ----------------- ➕ Add Todo -----------------
   function HandleInputs() {
-    if (inputValue.trim() === "") return;
-
-    const newTodo = {
-      id: uuidv4(),
-      title: inputValue,
-      details: " ",
-      isFinished: false,
-    };
-
-    const updatedTodos = [...todos, newTodo];
-    setTodos(updatedTodos);
-    localStorage.setItem("todos", JSON.stringify(updatedTodos));
+    Dispatch({type : "added" , payload : {title : inputValue}})
     setInputValue("");
+    HandleSnackBarAppear("Task Added Successfully")
   }
 
   function handleVal(e) {
@@ -73,12 +63,12 @@ export default function TodoCard() {
 
   // ----------------- ✅ Finish Toggle -----------------
   function OnClickHandleFinish(todoId) {
-    const updatedTodos = todos.map((t) =>
-      t.id === todoId ? { ...t, isFinished: !t.isFinished } : t
-    );
-    setTodos(updatedTodos);
-    localStorage.setItem("todos", JSON.stringify(updatedTodos));
-  }
+
+    Dispatch({type:"finish" , payload: {id : todoId }})
+    HandleSnackBarAppear("Task State Changed Successfully")
+   
+}
+
 
   // ----------------- ✏️ Edit Functions -----------------
   function onClickHandleEdit(todoId) {
@@ -86,19 +76,19 @@ export default function TodoCard() {
     setSelectedTodoId(todoId);
     setUpdatedDialog({ title: selectedTodo.title, details: selectedTodo.details });
     setEditDialog(true);
+    
   }
 
   function HandleEditDialogValue() {
-    const updatedList = todos.map((t) =>
-      t.id === SelectedTodoId
-        ? { ...t, title: UpdatedDialog.title, details: UpdatedDialog.details }
-        : t
-    );
-
-    setTodos(updatedList);
-    localStorage.setItem("todos", JSON.stringify(updatedList));
+   
+Dispatch({
+  type: "edited",
+  payload: { id: SelectedTodoId, title: UpdatedDialog.title, details: UpdatedDialog.details }
+})
+   
     setEditDialog(false);
     setUpdatedDialog({ title: "", details: "" });
+    HandleSnackBarAppear("Edited Successfully")
   }
 
   function onEditDialog() {
@@ -112,10 +102,9 @@ export default function TodoCard() {
   }
 
   function HandleDeleteButton() {
-    const updatedTodos = todos.filter((t) => t.id !== SelectedTodoId);
-    setTodos(updatedTodos);
-    localStorage.setItem("todos", JSON.stringify(updatedTodos));
+    Dispatch({type : "deleted" , payload : {id : SelectedTodoId }})
     setDeleteDialog(false);
+    HandleSnackBarAppear("Deleted Successfully")
   }
 
   function onCloseDialog() {
@@ -125,13 +114,21 @@ export default function TodoCard() {
     // -----------------  Filter Functions -----------------
     
 
-     const DisplayFinished = todos.filter((t) => {
+     const DisplayFinished = useMemo(() => {
+      return todos.filter((t) => {
       return t.isFinished
-     })
+     });
 
-     const DisplayNonFinished = todos.filter((t) => {
+     },[todos]
+    ) 
+
+     const DisplayNonFinished = useMemo(() => {
+      return todos.filter((t) => {
       return !t.isFinished
-     })
+     });
+
+     },[todos]
+    ) 
 
      
     let FilterTasks = todos
@@ -146,14 +143,15 @@ export default function TodoCard() {
 
   // ----------------- 🧾 Map Todo List -----------------
   const todosMap = FilterTasks.map((t) => (
-    <TodoList
-      key={t.id}
-      todo={t}
-      HandleFinishDialog={OnClickHandleFinish}
-      HandleDeleteDialog={onClickHandleDelete}
-      HandleEditDialog={onClickHandleEdit}
-    />
-  ));
+  <TodoList
+    key={t.id}
+    todo={t}
+    HandleFinishDialog={() => OnClickHandleFinish(t.id)}
+    HandleDeleteDialog={() => onClickHandleDelete(t.id)}
+    HandleEditDialog={() => onClickHandleEdit(t.id)}
+  />
+));
+
 
   // ----------------- 🧩 UI -----------------
   return (
